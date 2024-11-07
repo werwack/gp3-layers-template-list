@@ -17,6 +17,7 @@ from . import ui_layersGrpsTemplateList
 from . import class_LayerTree
 from . import ui_layerTreeItemList
 from . import layers_callbacks
+from . import active_object_callbacks
 from . import layerTree_operators
 from . import ui_layerTree_right_click_menu
 
@@ -28,6 +29,7 @@ def register():
     ui_layerTreeItemList.register()
     ui_layersGrpsTemplateList.register()
     layers_callbacks.register()
+    active_object_callbacks.register()
     layerTree_operators.register()
     ui_layerTree_right_click_menu.register()
 
@@ -39,6 +41,7 @@ def unregister():
 
     ui_layerTree_right_click_menu.unregister()
     layerTree_operators.unregister()
+    active_object_callbacks.unregister()
     ui_layersGrpsTemplateList.unregister()
     layers_callbacks.unregister()
     ui_layerTreeItemList.unregister()

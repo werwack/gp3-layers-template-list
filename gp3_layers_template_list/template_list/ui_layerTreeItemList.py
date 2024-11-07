@@ -35,6 +35,11 @@ def drawLayerTreeItem(context, layout, data, item, icon, active_data, active_pro
     # editedGpencil = props.getSelectedShotStoryboardFrame()
     editedGpencil = context.active_object
     layerOrGp = item.getGpLayerOrGpFromPt(editedGpencil)
+
+    if layerOrGp is None:
+        print("Layer not found")
+        return
+
     isLayer = item.type == "GreasePencilLayer"
 
     def _drawHierarchyIcons(layout):

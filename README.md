@@ -25,23 +25,27 @@ Feel free to send me any issue you may face, as well as suggestions to improve t
 ## Installation
 
 
+
 ## Use
 
 Once installed, the add-on panel appears in the N-tabs of the viewport under the name "Layers List".
 
-Click on it, and select a Grease Pencil object in the scene. The 
+Click on it, and select a Grease Pencil object in the scene. The layers are then displayed in the 
 
 
 ## Current limitations
 
-This implementation is facing 2 major limitations:
+At the moment this implementation is facing several limitations:
 
-* **Whenever the layers structure of the Grease Pencil object is changed, a manual action has to be done to refresh the add-on UI**
-  Indeed, at the moment, 
+* **Whenever the layers structure of the Grease Pencil object is changed, a manual action has to be done to refresh the layers list.**
+  Indeed, at the moment, the Python API is still not fully stable and has 2 issues preventing the layers structure to send notifications
+  when it is changed (from an operator such as Add or Remove Layer, or from a drag and drop for example).
 
 * **Layer and Layer Group colors are not supported**
   This will be the case on Blender 4.4.
 
-* Drag and drop not working
+* Drag and drop of layers and layer groups is not supported. This behavior is currently not supported by the template list component
+  of the Python API.
 
-* order not respected with empty layer groups
+* Empty layer groups may have a wrong position in the tree. This has no impact on the grease pencil object display though because
+  they are empty.
