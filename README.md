@@ -13,6 +13,9 @@ this is not an easy task since there is no template list provided by default in 
 **This add-on is then an attempt to simply re-creates the list of the layers and layer groups of a Grease Pencil object in a custom panel.**
 
 
+![GP_Layers And Groups Screen](images/GP_LayersAndGroupsScreen.jpg)
+
+
 ## Disclamer
 
 This is an experimental add-on. I cannot be held responsible for any misuse of the product or loss of data.
@@ -22,15 +25,26 @@ This implementation do not pretend to be perfect. It faces some limitations due 
 Feel free to send me any issue you may face, as well as suggestions to improve this implementation.
 
 
-## Installation
+## Download and Installation
 
+Get the add-on package from the [Release page](https://github.com/werwack/gp3-layers-template-list/releases/).
+
+Then open Blender 4.3, go to the Preference panel, Add-Ons section, then install the package thanks to the *Install From Disk...* 
+dropdown component, at the top right side of the window.
 
 
 ## Use
 
 Once installed, the add-on panel appears in the N-tabs of the viewport under the name "Layers List".
 
-Click on it, and select a Grease Pencil object in the scene. The layers are then displayed in the 
+Click on it, and select a Grease Pencil object in the scene. The layers are then displayed in the add-on panel.
+
+Layers and layer groups can be selected to set the active item, and they properties (mask, layer skin, visibility, lock) can be changed
+from the panel.
+
+Whenever the structure of the layers hierarchy is modified, when a layer or layer group is added, removed or moved for example, you have
+to press the "Refresh Layer Tree" button in order to manually force an update of the layer tree displayed in the add-on.
+This is a temporary limitation.
 
 
 ## Current limitations
