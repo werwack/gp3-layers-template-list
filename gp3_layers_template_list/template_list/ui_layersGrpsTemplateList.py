@@ -83,14 +83,17 @@ class GpLayersAndGroupsPanel(Panel):
         sub.operator("grease_pencil.layer_move", icon="TRIA_UP", text="").direction = "UP"
         sub.operator("grease_pencil.layer_move", icon="TRIA_DOWN", text="").direction = "DOWN"
 
-        # update the display of the gp layers tree
+        # for debug only ########################
+        # Uncomment this component to display a button that will allow you to manually update the layer tree structure
+        # layout.separator(factor=1.0)
+        # row = layout.row(align=True)
+        # row.operator_context = "INVOKE_DEFAULT"
+        # row.operator("wk.refreshlayertree", icon="FILE_REFRESH", text="Refresh Layer Tree").gpObjName = grease_pencil_obj.name
+
         layout.separator(factor=1.0)
         row = layout.row(align=True)
         row.operator_context = "INVOKE_DEFAULT"
-        row.operator("wk.refreshlayertree", icon="FILE_REFRESH", text="Refresh Layer Tree").gpObjName = grease_pencil_obj.name
-
-        layout.separator(factor=1.0)
-        layout.operator("wk.displaycustomprops")
+        row.operator("wk.displaycustomprops")
 
 
 _classes = (GpLayersAndGroupsPanel,)

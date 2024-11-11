@@ -39,7 +39,8 @@ class WkLayerTree(PropertyGroup):
 
     # the default value defined here is used instead of the default set in the property
     def _get_selected_layerTreeItem_index(self):
-        val = self.get("selected_layerTreeItem_index", -1)
+        # val = self.get("selected_layerTreeItem_index", -1)
+        val = -1
 
         # if self.selected_layerTreeItem_index < len(self.layerTreeItems):
         if True:
