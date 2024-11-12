@@ -14,7 +14,7 @@ Layer Tree functions
 """
 
 
-def getLayerTree(gpencil, verbose=False):
+def getLayerTree(gpencil, verbose=True):
     class LayerTreeItem:
         def __init__(self):
             # can be a layer or a group
@@ -138,6 +138,14 @@ def getLayerTree(gpencil, verbose=False):
 
     # now collect empty groups
     _addLayersOrGrpsTotree(doLayers=False)
+
+    print("\nLayers:")
+    for layer in gpencil.data.layers:
+        print(layer.name)
+
+    print("\nLayer Groups:")
+    for layerGp in gpencil.data.layer_groups:
+        print(layerGp.name)
 
     pointersList = gpLayerTreeRoot.printLayerTree()
 

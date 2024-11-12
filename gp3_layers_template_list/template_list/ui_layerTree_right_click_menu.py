@@ -14,25 +14,42 @@ Items added to the right click menu to extend the functionalities of some operat
 """
 
 import bpy
+from .layers_color import drawColorsRow
 
 
 def draw_wksl_layer_groups_menu_items(self, context):
-    print(f"context.button_prop: {context.button_prop}")
     prop = getattr(context, "button_prop", None)
+    if prop is None:
+        print("context.button_prop: None")
     if prop is not None:
+        print(f"context.button_prop: {context.button_prop}")
         print(f"button_prop: {prop.__class__.__name__}")
         print(f"button_prop: {prop.name}")
         print(f"button_prop identifier: {prop.identifier}")
     if prop is not None and "selected_layerTreeItem_index" == prop.identifier:
         layout = self.layout
-        layout.separator()
-        layout.operator("grease_pencil.layer_group_remove", text="Delete Group").keep_children = False
-        layout.operator("grease_pencil.layer_group_remove", text="Ungroup").keep_children = True
-        layout.operator("grease_pencil.layer_merge", text="Merge Group").mode = "GROUP"
 
-        # layout.separator()
-        # row = layout.row(align=True)
-        # row.operator_enum("grease_pencil.layer_group_color_tag", "color_tag", icon_only=True)
+        layerTree = bpy.context.window_manager.Wk_GPSceneLayerTree
+        activeLayerOrGpItem = layerTree.getLayerTreeSelectedItem()
+        # activeLayerOrGp = getActiveLayerOrGp(gp)
+        if not activeLayerOrGpItem.isLayer():
+            layout.separator()
+            layout.operator("grease_pencil.layer_group_remove", text="Delete Group").keep_children = False
+            layout.operator("grease_pencil.layer_group_remove", text="Ungroup").keep_children = True
+            layout.operator("grease_pencil.layer_merge", text="Merge Group").mode = "GROUP"
+
+            # layout.separator()
+            # row = layout.row(align=True)
+            # row.operator_enum("grease_pencil.layer_group_color_tag", "color_tag", icon_only=True)
+
+            # from Blender
+            # layout.separator()
+            # row = layout.row(align=True)
+            # row.operator_enum("grease_pencil.layer_group_color_tag", "color_tag", icon_only=True)
+
+            # custom
+            layout.separator()
+            drawColorsRow(layout)
 
 
 def register():

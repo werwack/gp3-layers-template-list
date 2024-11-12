@@ -20,7 +20,7 @@ bl_info = {
     "author": "Julien Blervaque (aka Werwack)",
     "description": "Re-create the layers list of a Grease Pencil object in a custom panel",
     "blender": (4, 3, 0),
-    "version": (1, 0, 1),
+    "version": (1, 0, 2),
     "location": "View3D > Layers List",
     "doc_url": "https://github.com/werwack/gp3-layers-template-list",
     "tracker_url": "https://github.com/werwack/gp3-layers-template-list/issues",

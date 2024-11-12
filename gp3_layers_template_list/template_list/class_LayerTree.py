@@ -23,6 +23,8 @@ from .layerTree_functions import getLayerTree, getActiveLayerOrGp
 
 class WkLayerTree(PropertyGroup):
 
+    # NOTE: All the layers and groups are store in a flat linear list object and not in a chained list with chilren array for each item
+    # This is because we need that flat array to use the selected item index in the template list
     layerTreeItems: CollectionProperty(name="Layer Tree Items", type=WkLayerTreeItem)
 
     def getItemFromPt(self, layerOrGpPt):
@@ -120,7 +122,21 @@ class WkLayerTree(PropertyGroup):
             pass
 
     def refreshlayerTree(self, gpobj):
+        layersInfo = list()
+
+        def _getItemInfo(layerOrGroupPt):
+            for item in layersInfo:
+                if layerOrGroupPt == item[0]:
+                    return item
+            return None
+
         pass
+        # previousLayerTreeContent = self.layerTreeItems blabla
+        # copy only the pointers and info to report
+        for item in self.layerTreeItems:
+            itemInfo = [item.layerOrGroupPt, item.flag, item.expanded, item.colorTag]
+            layersInfo.append(itemInfo)
+
         self.layerTreeItems.clear()
         pointersList = getLayerTree(gpobj)
 
@@ -132,6 +148,24 @@ class WkLayerTree(PropertyGroup):
             layerTreeItem.type = pt[1]
             layerTreeItem.depth = pt[2]
             layerTreeItem.numChildren = pt[3]
+
+            itemInfo = _getItemInfo(layerTreeItem.layerOrGroupPt)
+            if itemInfo is not None:
+                layerTreeItem.flag = itemInfo[1]
+                layerTreeItem.expanded = itemInfo[2]
+                layerTreeItem.colorTag = itemInfo[3]
+            # find in previousLayerTreeContent from Pt
+            # report info
+
+    def getCutItem(self):
+        for item in self.layerTreeItems:
+            if "CUT" == item.flag:
+                return item
+        return None
+
+    def clearFlags(self):
+        for item in self.layerTreeItems:
+            item.flag = ""
 
 
 _classes = (

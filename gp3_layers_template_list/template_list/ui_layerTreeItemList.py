@@ -11,12 +11,14 @@
 
 
 """
-UI for the snapshots - in the snaptshots list component
+Layers Tree List
 """
 
 import bpy
 from bpy.types import UIList
 from . import config_icons
+from .layers_color import getColorIcon
+
 
 #############
 # LayerTreeItem
@@ -64,12 +66,14 @@ def drawLayerTreeItem(context, layout, data, item, icon, active_data, active_pro
                 subRow.ui_units_x = 0.74
                 subRow.label(icon="BLANK1")
             else:
-                # if layerOrGp.isExpanded:
-                if True:
-                    subRow.ui_units_x = 0.74
-                    subRow.label(text="", icon="DOWNARROW_HLT")
+                # subRow.ui_units_x = 0.74
+                subRow.ui_units_x = 0.82
+                if item.expanded:
+                    # subRow.label(text="", icon="DOWNARROW_HLT")
+                    subRow.prop(item, "expanded", text="", icon="DOWNARROW_HLT", emboss=False)
                 else:
-                    subRow.label(icon="RIGHTARROW")
+                    # subRow.label(icon="RIGHTARROW")
+                    subRow.prop(item, "expanded", text="", icon="RIGHTARROW", emboss=False)
             layout.separator(factor=0.8)
 
     # layout.label(text=item.name)
@@ -77,15 +81,18 @@ def drawLayerTreeItem(context, layout, data, item, icon, active_data, active_pro
 
     row = layout.row(align=True)
 
+    row.alert = "" != item.flag
+
     _drawHierarchyIcons(row)
 
     typeRow = row.row(align=True)
     typeRow.ui_units_x = 1
     if isLayer:
         typeRow.label(text="", icon="OUTLINER_DATA_GP_LAYER")
-
     else:
-        typeRow.label(text="", icon="GREASEPENCIL_LAYER_GROUP")
+        icon = getColorIcon(item.colorTag)
+        # typeRow.label(text="", icon="GREASEPENCIL_LAYER_GROUP")
+        typeRow.label(text="", icon=icon)
 
     row.separator(factor=0.4)
     # use a prop and not a label to makeit editable by double-click

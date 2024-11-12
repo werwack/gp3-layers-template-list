@@ -83,17 +83,36 @@ class GpLayersAndGroupsPanel(Panel):
         sub.operator("grease_pencil.layer_move", icon="TRIA_UP", text="").direction = "UP"
         sub.operator("grease_pencil.layer_move", icon="TRIA_DOWN", text="").direction = "DOWN"
 
-        # for debug only ########################
-        # Uncomment this component to display a button that will allow you to manually update the layer tree structure
-        # layout.separator(factor=1.0)
-        # row = layout.row(align=True)
-        # row.operator_context = "INVOKE_DEFAULT"
-        # row.operator("wk.refreshlayertree", icon="FILE_REFRESH", text="Refresh Layer Tree").gpObjName = grease_pencil_obj.name
+        # experimental
+        # col.separator()
+        # sub = col.column(align=True)
+        # sub.operator_context = "INVOKE_DEFAULT"
+        # sub.operator("wk.movelayerorgrp", icon="TRIA_UP", text="").direction = "UP"
+        # sub.operator("wk.movelayerorgrp", icon="TRIA_DOWN", text="").direction = "DOWN"
 
+        col.separator()
+        sub = col.column(align=True)
+        # copy: COPYDOWN
+        # cut: PASTEFLIPUP
+        # paste: PASTEDOWN
+        sub.operator_context = "INVOKE_DEFAULT"
+        sub.operator("wk.cutlayersubtree", icon="PASTEFLIPUP", text="")
+        sub.operator("wk.pastelayersubtree", icon="PASTEDOWN", text="")
+
+        # for customization ########################
         layout.separator(factor=1.0)
         row = layout.row(align=True)
         row.operator_context = "INVOKE_DEFAULT"
         row.operator("wk.displaycustomprops")
+
+        # for debug only ########################
+        # hide this button in your onw implementation
+        # display a button that will allow you to manually update the layer tree structure
+        layout.separator(factor=1.0)
+        row = layout.row(align=True)
+        row.label(text="For Debug Only:")
+        row.operator_context = "INVOKE_DEFAULT"
+        row.operator("wk.refreshlayertree", icon="FILE_REFRESH", text="Refresh Layer Tree").gpObjName = grease_pencil_obj.name
 
 
 _classes = (GpLayersAndGroupsPanel,)

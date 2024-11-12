@@ -20,6 +20,7 @@ from . import layers_callbacks
 from . import active_object_callbacks
 from . import layerTree_operators
 from . import ui_layerTree_right_click_menu
+from . import layers_operators
 
 
 def register():
@@ -32,6 +33,7 @@ def register():
     active_object_callbacks.register()
     layerTree_operators.register()
     ui_layerTree_right_click_menu.register()
+    layers_operators.register()
 
     bpy.types.WindowManager.Wk_GP_LayerTreeUseCustomProps = BoolProperty(default=False)
 
@@ -39,6 +41,7 @@ def register():
 def unregister():
     del bpy.types.WindowManager.Wk_GP_LayerTreeUseCustomProps
 
+    layers_operators.unregister()
     ui_layerTree_right_click_menu.unregister()
     layerTree_operators.unregister()
     active_object_callbacks.unregister()
