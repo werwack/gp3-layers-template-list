@@ -10,22 +10,38 @@
 # You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 """
-Layer Tree functions
+Layer Tree Pointers list functions
 """
 
 
-def getLayerTree(gpencil, verbose=True):
-    class LayerTreeItem:
+def getLayerTreePointers(gpencil, verbose=True):
+    """Return a flat list of tupples made of:
+    - a pointer to a layer or layer group
+    - the name of the entity type: "GreasePencilLayer" or "GreasePencilLayerGroup"
+    - the depth of the entity in the tree hierarchy (0: at root level)
+    - the number of children
+
+    Note: the use of instances of the class LayerTreeEntity is purely internal to this file
+    """
+
+    class LayerTreeEntity:
         def __init__(self):
             # can be a layer or a group
             self.layerOrGroup = None
 
-            self.parent = None
-            # list of LayerTreeItem
+            # not used
+            # self.parent = None
+
+            # list of LayerTreeEntity
             self.children = list()
 
+        def isLayer(self):
+            if self.layerOrGroup is None:
+                return None
+            return "GreasePencilLayer" == type(self.layerOrGroup).__name__
+
         def getChildIndex(self, layerOrGrp):
-            """Return the index of a LayerTreeItem in the current LayerTreeItem, -1 if not found"""
+            """Return the index of a LayerTreeEntity in the current LayerTreeEntity, -1 if not found"""
             for i, it in enumerate(self.children):
                 if layerOrGrp == it.layerOrGroup:
                     return i
@@ -33,7 +49,7 @@ def getLayerTree(gpencil, verbose=True):
 
         def getChildRec(self, layerOrGrp):
             def _getChildRec(item, layerOrGrp):
-                """Return a LayerTreeItem, None if not found"""
+                """Return a LayerTreeEntity, None if not found"""
                 # parcours des enfants génération par génération, pas en profondeur
                 for child in item.children:
                     if child.layerOrGroup == layerOrGrp:
@@ -59,14 +75,28 @@ def getLayerTree(gpencil, verbose=True):
             # return None
 
         def getChild(self, layerOrGrp):
-            """Return a LayerTreeItem, None if not found"""
+            """Return a LayerTreeEntity, None if not found"""
             childInd = self.getChildIndex(layerOrGrp)
             if -1 != childInd:
                 return self.children[childInd]
             return None
 
-        def printLayerTree(self):
+        def printLayerTree(self, emptyGroups, tmpLayers):
             pointersList = list()
+
+            def _findInGroupsFromPointer(pt, emptyGrps):
+                """return the group, None if not found"""
+                for grp in emptyGrps:
+                    if str(pt) == str(grp.as_pointer()):
+                        return grp
+                return None
+
+            # def _findInTmpLayersFromPointer(pt):
+            #     """return the group, None if not found"""
+            #     for grp in emptyGrps:
+            #         if str(pt) == str(grp.as_pointer()):
+            #             return grp
+            #     return None
 
             def _printLayerTreeRec(layerTree, spacer):
                 if layerTree.layerOrGroup is None:
@@ -75,15 +105,28 @@ def getLayerTree(gpencil, verbose=True):
                 else:
                     if verbose:
                         print(f"{spacer}- {layerTree.layerOrGroup.name}")
-                    # pointer / layer type / depth / num children
-                    pointersList.append(
-                        (
-                            layerTree.layerOrGroup.as_pointer(),
-                            type(layerTree.layerOrGroup).__name__,
-                            int(len(spacer) / 2),
-                            len(layerTree.children),
+
+                    # ignore temp layers
+                    # if layerTree.parent is not None and _findInGroupsFromPointer(layerTree.parent, emptyGroups) is not None:
+                    # if layerTree.parent is not None and layerTree.parent.layerOrGroup in emptyGroups:
+                    if layerTree.layerOrGroup in tmpLayers:
+                        # layerTree is a temp layer entity in an empty group
+                        pass
+                    else:
+                        numChildren = len(layerTree.children)
+                        if layerTree.layerOrGroup in emptyGroups:
+                            # layerTree is an empty group entity
+                            numChildren = 0
+
+                        # pointer / layer type / depth / num children
+                        pointersList.append(
+                            (
+                                layerTree.layerOrGroup.as_pointer(),
+                                type(layerTree.layerOrGroup).__name__,
+                                int(len(spacer) / 2),
+                                numChildren,
+                            )
                         )
-                    )
                 # for it in reversed(layerTree.children):
                 for it in reversed(layerTree.children):
                     spacerChild = spacer + "  "
@@ -92,9 +135,21 @@ def getLayerTree(gpencil, verbose=True):
             _printLayerTreeRec(self, "")
             return pointersList
 
-    gpLayerTreeRoot = LayerTreeItem()
+        def getEmptyGroups_old_tooLong(self):
+            """Return a list of all the empty group entities found under that branch level"""
 
-    def _addLayersOrGrpsTotree(doLayers=True):
+            def _recGetEmptyGroups(entity, empty_groups):
+                if 0 == len(entity.children) and entity.isLayer():
+                    empty_groups.append(self)
+                else:
+                    for c in entity.children:
+                        _recGetEmptyGroups(c, empty_groups)
+
+            emptyGroups = list()
+            _recGetEmptyGroups(self, emptyGroups)
+            return emptyGroups
+
+    def _addLayersOrGrpsToTree(treeRoot, doLayers=True):
         layersOrGroups = gpencil.data.layers if doLayers else gpencil.data.layer_groups
 
         for layer in layersOrGroups:
@@ -109,12 +164,12 @@ def getLayerTree(gpencil, verbose=True):
             # parentGrpReversed = [gp for gp in range(len(parentGrp) - 1, -1, -1)]
             # parentGrp = parentGrpReversed
 
-            subTreeItem = gpLayerTreeRoot
+            subTreeItem = treeRoot
             # we start from the root parent group
             for parentGrp in reversed(parentGrps):
                 child = subTreeItem.getChildRec(parentGrp)
                 if child is None:
-                    gpLayerTreeItem = LayerTreeItem()
+                    gpLayerTreeItem = LayerTreeEntity()
                     gpLayerTreeItem.layerOrGroup = parentGrp
                     # is its parent in the tree?
                     subTreeItem.children.append(gpLayerTreeItem)
@@ -125,7 +180,7 @@ def getLayerTree(gpencil, verbose=True):
             # now add the layer as a leaf
             child = subTreeItem.getChild(layer)
             if child is None:
-                gpLayerTreeItem = LayerTreeItem()
+                gpLayerTreeItem = LayerTreeEntity()
                 gpLayerTreeItem.layerOrGroup = layer
                 subTreeItem.children.append(gpLayerTreeItem)
                 # subTreeItem = gpLayerTreeItem     # not necessary
@@ -133,11 +188,48 @@ def getLayerTree(gpencil, verbose=True):
                 subTreeItem = child  # not necessary
                 pass
 
+    ############################################################
+
+    useEmptyGrpFix = True
+    emptyGroups = list()
+    tmpLayers = list()
+    ###############
+    # fix empty groups order
+    if useEmptyGrpFix:
+        emptyGroups = getEmptyGroups(gpencil)
+        print("\nEmpty groups:")
+        if len(emptyGroups):
+            for gp in emptyGroups:
+                print(f"  {gp.name}")
+        else:
+            print("  no empty groups")
+
+        # add temp layer in groups
+        for grp in emptyGroups:
+            newTmpLayer = gpencil.data.layers.new("__wksl_tmpLayer__", set_active=False, layer_group=grp)
+            tmpLayers.append(newTmpLayer)
+
+    ###############
+
+    gpLayerTreeRoot = LayerTreeEntity()
+
     # collect layers
-    _addLayersOrGrpsTotree(doLayers=True)
+    _addLayersOrGrpsToTree(gpLayerTreeRoot, doLayers=True)
 
     # now collect empty groups
-    _addLayersOrGrpsTotree(doLayers=False)
+    _addLayersOrGrpsToTree(gpLayerTreeRoot, doLayers=False)
+
+    pointersList = gpLayerTreeRoot.printLayerTree(emptyGroups, tmpLayers)
+
+    ###############
+    # fix empty groups order
+    # remove tmp layers
+    # wkip we could use pointers instead of layers for tmp layers
+    if useEmptyGrpFix:
+        for layer in tmpLayers:
+            gpencil.data.layers.remove(layer)
+
+    ###############
 
     print("\nLayers:")
     for layer in gpencil.data.layers:
@@ -147,10 +239,36 @@ def getLayerTree(gpencil, verbose=True):
     for layerGp in gpencil.data.layer_groups:
         print(layerGp.name)
 
-    pointersList = gpLayerTreeRoot.printLayerTree()
-
     # return gpLayerTreeRoot
     return pointersList
+
+
+def getEmptyGroups(gpencil):
+    """Return a list of all the empty groups"""
+    emptyGroups = [gp for gp in gpencil.data.layer_groups]
+    for gp in gpencil.data.layer_groups:
+        if len(emptyGroups):
+            if gp.parent_group in emptyGroups:
+                emptyGroups.remove(gp.parent_group)
+        else:
+            break
+
+    if len(emptyGroups):
+        for layer in gpencil.data.layers:
+            if len(emptyGroups):
+                if layer.parent_group in emptyGroups:
+                    emptyGroups.remove(layer.parent_group)
+            else:
+                break
+
+    return emptyGroups
+
+
+def getLayerFromPt(gpencil, layerPointer):
+    for layer in gpencil.data.layers:
+        if str(layer.as_pointer()) == str(layerPointer):
+            return layer
+    return None
 
 
 def getActiveLayerOrGp(gp):

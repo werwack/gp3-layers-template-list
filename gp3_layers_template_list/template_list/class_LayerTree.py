@@ -9,6 +9,7 @@
 #
 # You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
 
+
 """
 Layer Tree class
 """
@@ -18,7 +19,7 @@ from bpy.types import PropertyGroup
 from bpy.props import PointerProperty, IntProperty, CollectionProperty
 
 from .class_LayerTreeItem import WkLayerTreeItem
-from .layerTree_functions import getLayerTree, getActiveLayerOrGp
+from .layerTree_functions import getLayerTreePointers, getActiveLayerOrGp
 
 
 class WkLayerTree(PropertyGroup):
@@ -138,7 +139,7 @@ class WkLayerTree(PropertyGroup):
             layersInfo.append(itemInfo)
 
         self.layerTreeItems.clear()
-        pointersList = getLayerTree(gpobj)
+        pointersList = getLayerTreePointers(gpobj)
 
         for pt in pointersList:
             layerTreeItem = self.layerTreeItems.add()

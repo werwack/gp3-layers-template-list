@@ -13,6 +13,7 @@
 Layer Tree operators
 """
 
+
 import bpy
 from bpy.types import Operator
 from bpy.props import StringProperty
@@ -168,11 +169,11 @@ class Wk_OT_PasteLayerSubTree(Operator):
     def poll(cls, context):
         res = context.object is not None and "GREASEPENCIL" == context.object.type
 
-        if res:
-            layerTree = bpy.context.window_manager.Wk_GPSceneLayerTree
-            activeLayerOrGpItem = layerTree.getLayerTreeSelectedItem()
-            if not "" == activeLayerOrGpItem.flag:
-                res = False
+        # if res:
+        #     layerTree = bpy.context.window_manager.Wk_GPSceneLayerTree
+        #     activeLayerOrGpItem = layerTree.getLayerTreeSelectedItem()
+        #     if not "" == activeLayerOrGpItem.flag:
+        #         res = False
         return res
 
     def invoke(self, context, event):

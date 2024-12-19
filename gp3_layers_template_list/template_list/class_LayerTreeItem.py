@@ -13,6 +13,7 @@
 WkLayerTreeItem class
 """
 
+
 import bpy
 from bpy.types import PropertyGroup
 from bpy.props import StringProperty, IntProperty, BoolProperty, EnumProperty
@@ -59,7 +60,7 @@ class WkLayerTreeItem(PropertyGroup):
     def isLayer(self):
         return "GreasePencilLayer" == self.type
 
-    depth: IntProperty(name="type", default=0)
+    depth: IntProperty(name="type", description="Depht of the item in the tree hierarchy (0: at root level)", default=0)
     numChildren: IntProperty(name="Num Children", default=0)
 
     # custom properties
@@ -110,10 +111,16 @@ class WkLayerTreeItem(PropertyGroup):
                     return layer
         return None
 
-    def getGpLayerFromPt(self, editedGpencil):
+    def getLayerFromPt(self, editedGpencil):
         for layer in editedGpencil.data.layers:
             if str(layer.as_pointer()) == self.layerOrGroupPt:
                 return layer
+        return None
+
+    def getGpLayerFromPt(self, editedGpencil):
+        for layerGp in editedGpencil.data.layer_groups:
+            if str(layerGp.as_pointer()) == self.layerOrGroupPt:
+                return layerGp
         return None
 
     def getParentGroupItem(self, withIndexDict=False):
@@ -171,7 +178,7 @@ class WkLayerTreeItem(PropertyGroup):
         itemIndex += 1
 
         if itemIndex < len(layerTree.layerTreeItems):
-            while self.depth < int(layerTree.layerTreeItems[itemIndex].depth) and itemIndex < len(layerTree.layerTreeItems):
+            while itemIndex < len(layerTree.layerTreeItems) and self.depth < int(layerTree.layerTreeItems[itemIndex].depth):
                 containedItems.append(layerTree.layerTreeItems[itemIndex])
                 itemIndex += 1
 
